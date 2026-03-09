@@ -7,6 +7,7 @@ import Sidebar from '../components/layout/Sidebar';
 import PostCard from '../components/post/PostCard';
 import InfiniteScroll from '../components/common/InfiniteScroll';
 import SkeletonLoader, { ProfileSkeleton } from '../components/common/SkeletonLoader';
+import FollowModal from '../components/user/FollowModal';
 import { 
   MapPin, Link as LinkIcon, Calendar, Users, 
   UserPlus, UserMinus, Settings, Bookmark, 
@@ -32,6 +33,8 @@ const ProfilePage = () => {
   
   const [activeTab, setActiveTab] = useState('posts'); // 'posts', 'saved'
   const [viewMode, setViewMode] = useState('list'); // 'list', 'grid'
+  const [showFollowModal, setShowFollowModal] = useState(false);
+  const [followModalType, setFollowModalType] = useState('followers');
   
   const isOwnProfile = currentUser?.userId === parseInt(userId);
 
@@ -248,13 +251,25 @@ const ProfilePage = () => {
 
               {/* Stats */}
               <div className="flex gap-6">
-                <button className="hover:underline">
+                <button 
+                  onClick={() => {
+                    setFollowModalType('following');
+                    setShowFollowModal(true);
+                  }}
+                  className="hover:underline"
+                >
                   <span className="font-bold text-gray-900 dark:text-white">
                     {followStats.following}
                   </span>
                   <span className="text-gray-600 dark:text-gray-400 ml-1">Following</span>
                 </button>
-                <button className="hover:underline">
+                <button 
+                  onClick={() => {
+                    setFollowModalType('followers');
+                    setShowFollowModal(true);
+                  }}
+                  className="hover:underline"
+                >
                   <span className="font-bold text-gray-900 dark:text-white">
                     {followStats.followers}
                   </span>
@@ -339,6 +354,14 @@ const ProfilePage = () => {
           </div>
         </main>
       </div>
+
+      {/* Follow Modal */}
+      <FollowModal
+        isOpen={showFollowModal}
+        onClose={() => setShowFollowModal(false)}
+        userId={userId}
+        type={followModalType}
+      />
     </div>
   );
 };

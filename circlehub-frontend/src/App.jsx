@@ -10,6 +10,7 @@ import ExplorePage from './pages/ExplorePage';
 import CreatePostPage from './pages/CreatePostPage';
 import ProfilePage from './pages/ProfilePage';
 import SavedPostsPage from './pages/SavedPostsPage';
+import SettingsPage from './pages/SettingsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -125,6 +126,14 @@ function AppRoutes() {
             <div className="min-h-screen flex items-center justify-center">
               <p>Notifications - Coming Soon</p>
             </div>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
           </ProtectedRoute>
         }
       />
