@@ -1,12 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { ToastProvider } from './contexts/ToastContext';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ExplorePage from './pages/ExplorePage';
 import CreatePostPage from './pages/CreatePostPage';
+import ProfilePage from './pages/ProfilePage';
+import SavedPostsPage from './pages/SavedPostsPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -111,9 +114,7 @@ function AppRoutes() {
         path="/saved"
         element={
           <ProtectedRoute>
-            <div className="min-h-screen flex items-center justify-center">
-              <p>Saved - Coming Soon</p>
-            </div>
+            <SavedPostsPage />
           </ProtectedRoute>
         }
       />
@@ -138,12 +139,10 @@ function AppRoutes() {
         }
       />
       <Route
-        path="/profile"
+        path="/profile/:userId"
         element={
           <ProtectedRoute>
-            <div className="min-h-screen flex items-center justify-center">
-              <p>Profile - Coming Soon</p>
-            </div>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />
@@ -167,11 +166,13 @@ function AppRoutes() {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }
