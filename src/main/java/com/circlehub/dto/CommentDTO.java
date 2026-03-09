@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,4 +18,7 @@ public class CommentDTO {
     private String userProfilePicture;
     private Long postId;
     private LocalDateTime createdAt;
+    private Long parentId; // null for top-level comments
+    private List<CommentDTO> replies; // nested replies
+    private Integer replyCount; // count of direct replies
 }

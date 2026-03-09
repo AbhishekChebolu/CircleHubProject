@@ -1,5 +1,6 @@
 package com.circlehub.dto;
 
+import com.circlehub.model.Post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,11 @@ import java.time.LocalDateTime;
 public class PostDTO {
     private Long id;
     private String content;
-    private String imageUrl;
+    private String mediaUrls;
+    private Post.MediaType mediaType;
+    private Boolean isEdited;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Long userId;
     private String userName;
     private String userProfilePicture;
@@ -22,4 +26,5 @@ public class PostDTO {
     private Integer likeCount;
     private Integer commentCount;
     private Boolean isLikedByCurrentUser;
+    private Boolean isSavedByCurrentUser;
 }

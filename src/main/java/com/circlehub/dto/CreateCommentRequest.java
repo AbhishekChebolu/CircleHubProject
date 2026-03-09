@@ -16,4 +16,6 @@ public class CreateCommentRequest {
     
     @NotNull(message = "Post ID is required")
     private Long postId;
+    
+    private Long parentId; // Optional: for nested replies
 }

@@ -29,6 +29,20 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
     
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostDTO> updatePost(
+            @PathVariable Long postId,
+            @RequestBody String content) {
+        PostDTO post = postService.updatePost(postId, content);
+        return ResponseEntity.ok(post);
+    }
+    
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok(new ApiResponse(true, "Post deleted successfully"));
+    }
+    
     @GetMapping("/circle/{circleId}")
     public ResponseEntity<List<PostDTO>> getPostsByCircle(@PathVariable Long circleId) {
         List<PostDTO> posts = postService.getPostsByCircle(circleId);

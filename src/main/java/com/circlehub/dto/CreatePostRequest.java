@@ -1,6 +1,6 @@
 package com.circlehub.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.circlehub.model.Post;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,10 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreatePostRequest {
     
-    @NotBlank(message = "Content is required")
     private String content;
     
-    private String imageUrl;
+    private String mediaUrls; // JSON array of media URLs
+    
+    private Post.MediaType mediaType;
     
     @NotNull(message = "Circle ID is required")
     private Long circleId;

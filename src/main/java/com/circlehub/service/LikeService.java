@@ -21,6 +21,9 @@ public class LikeService {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private NotificationService notificationService;
+    
     @Transactional
     public void toggleLike(Long postId) {
         User currentUser = userService.getCurrentUser();
@@ -36,6 +39,11 @@ public class LikeService {
             like.setUser(currentUser);
             like.setPost(post);
             likeRepository.save(like);
+            
+            // Notify post author (don't notify if user likes their own post)
+            if (!post.getUser().getId().equals(currentUser.getId())) {
+                notificationService.notifyLike(post.getUser(), currentUser, post);
+            }
         }
     }
 }
