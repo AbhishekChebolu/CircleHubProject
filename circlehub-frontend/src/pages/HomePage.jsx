@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
-import { circleService, postService } from '../services/api';
+import { circleService, feedService } from '../services/api';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import PostCard from '../components/post/PostCard';
 import CircleCard from '../components/circle/CircleCard';
-import { Loader2 } from 'lucide-react';
+import InfiniteScroll from '../components/common/InfiniteScroll';
+import SkeletonLoader from '../components/common/SkeletonLoader';
+import { TrendingUp, Home as HomeIcon, Compass } from 'lucide-react';
 
 const HomePage = () => {
   const [circles, setCircles] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCircle, setSelectedCircle] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [feedType, setFeedType] = useState('home'); // 'home', 'trending', 'explore'
 
   useEffect(() => {
     loadData();
@@ -18,12 +23,12 @@ const HomePage = () => {
 
   const loadData = async () => {
     try {
+      setLoading(true);
       const circlesResponse = await circleService.getAllCircles();
       setCircles(circlesResponse.data);
       
-      if (circlesResponse.data.length > 0) {
-        loadPosts(circlesResponse.data[0].id);
-      }
+      // Load initial feed
+      await loadFeed(0, true);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -31,17 +36,60 @@ const HomePage = () => {
     }
   };
 
-  const loadPosts = async (circleId) => {
+  const loadFeed = async (pageNum, reset = false) => {
     try {
-      setLoading(true);
-      const postsResponse = await postService.getPostsByCircle(circleId);
-      setPosts(postsResponse.data);
-      setSelectedCircle(circleId);
+      if (reset) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      let response;
+      switch (feedType) {
+        case 'trending':
+          response = await feedService.getTrendingFeed(pageNum, 20);
+          break;
+        case 'explore':
+          response = await feedService.getExploreFeed(pageNum, 20);
+          break;
+        default:
+          response = await feedService.getHomeFeed(pageNum, 20);
+      }
+
+      const newPosts = response.data;
+      
+      if (reset) {
+        setPosts(newPosts);
+      } else {
+        setPosts(prev => [...prev, ...newPosts]);
+      }
+      
+      setHasMore(newPosts.length === 20);
+      setPage(pageNum);
     } catch (error) {
-      console.error('Error loading posts:', error);
-      setPosts([]);
+      console.error('Error loading feed:', error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleFeedTypeChange = (type) => {
+    setFeedType(type);
+    setPosts([]);
+    setPage(0);
+    setHasMore(true);
+  };
+
+  useEffect(() => {
+    if (feedType) {
+      loadFeed(0, true);
+    }
+  }, [feedType]);
+
+  const loadMore = () => {
+    if (!loadingMore && hasMore) {
+      loadFeed(page + 1, false);
     }
   };
 
@@ -50,13 +98,7 @@ const HomePage = () => {
     console.log('Comment on post:', post.id);
   };
 
-  if (loading && circles.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -67,22 +109,58 @@ const HomePage = () => {
         {/* Main Feed */}
         <main className="flex-1 ml-64 mr-80 p-6 min-h-screen">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Home Feed</h1>
+            {/* Feed Type Selector */}
+            <div className="flex gap-2 mb-6 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
+              <button
+                onClick={() => handleFeedTypeChange('home')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
+                  ${feedType === 'home' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                <HomeIcon className="w-4 h-4" />
+                Home
+              </button>
+              <button
+                onClick={() => handleFeedTypeChange('trending')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
+                  ${feedType === 'trending' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                <TrendingUp className="w-4 h-4" />
+                Trending
+              </button>
+              <button
+                onClick={() => handleFeedTypeChange('explore')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-all
+                  ${feedType === 'explore' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              >
+                <Compass className="w-4 h-4" />
+                Explore
+              </button>
+            </div>
             
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-              </div>
+            {loading && posts.length === 0 ? (
+              <SkeletonLoader type="post" count={3} />
             ) : posts.length === 0 ? (
               <div className="card p-12 text-center">
                 <p className="text-gray-500">No posts yet. Join a circle and start creating content!</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {posts.map((post) => (
-                  <PostCard key={post.id} post={post} onCommentClick={handleCommentClick} />
-                ))}
-              </div>
+              <InfiniteScroll
+                loadMore={loadMore}
+                hasMore={hasMore}
+                loading={loadingMore}
+              >
+                <div className="space-y-4">
+                  {posts.map((post) => (
+                    <PostCard key={post.id} post={post} onCommentClick={handleCommentClick} />
+                  ))}
+                </div>
+              </InfiniteScroll>
             )}
           </div>
         </main>
@@ -93,13 +171,7 @@ const HomePage = () => {
             <h2 className="text-lg font-bold mb-4">Suggested Circles</h2>
             <div className="space-y-4">
               {circles.slice(0, 5).map((circle) => (
-                <div 
-                  key={circle.id} 
-                  onClick={() => loadPosts(circle.id)}
-                  className={`cursor-pointer ${selectedCircle === circle.id ? 'ring-2 ring-primary-500' : ''}`}
-                >
-                  <CircleCard circle={circle} />
-                </div>
+                <CircleCard key={circle.id} circle={circle} />
               ))}
             </div>
           </div>

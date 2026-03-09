@@ -1,8 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Bell, MessageCircle, Moon, Sun, LogOut, User } from 'lucide-react';
+import { MessageCircle, Moon, Sun, LogOut, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useState } from 'react';
+import SearchBar from '../search/SearchBar';
+import NotificationBell from '../notifications/NotificationBell';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -31,14 +33,7 @@ const Navbar = () => {
 
           {/* Search Bar */}
           <div className="flex-1 max-w-2xl mx-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search circles, posts, people..."
-                className="w-full pl-12 pr-4 py-2.5 bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-primary-500 rounded-xl outline-none transition-all duration-200"
-              />
-            </div>
+            <SearchBar />
           </div>
 
           {/* Right Section */}
@@ -57,14 +52,7 @@ const Navbar = () => {
             </button>
 
             {/* Notifications */}
-            <button
-              onClick={() => navigate('/notifications')}
-              className="relative p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+            <NotificationBell />
 
             {/* Messages */}
             <button
