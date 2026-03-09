@@ -36,6 +36,18 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicture;
     
+    @Column(name = "cover_picture")
+    private String coverPicture;
+    
+    @Column(name = "website")
+    private String website;
+    
+    @Column(name = "location")
+    private String location;
+    
+    @Column(name = "is_verified")
+    private Boolean isVerified = false;
+    
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -51,4 +63,16 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Like> likes = new HashSet<>();
+    
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+    private Set<UserFollow> following = new HashSet<>();
+    
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL)
+    private Set<UserFollow> followers = new HashSet<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<SavedPost> savedPosts = new HashSet<>();
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Notification> notifications = new HashSet<>();
 }

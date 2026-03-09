@@ -7,22 +7,18 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "saved_posts",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "post_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class SavedPost {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,14 +28,7 @@ public class Comment {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Comment parent;
-    
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<Comment> replies = new HashSet<>();
-    
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "saved_at", nullable = false, updatable = false)
+    private LocalDateTime savedAt;
 }

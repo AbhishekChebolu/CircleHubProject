@@ -7,39 +7,44 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "notifications")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Notification {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
+    @JoinColumn(name = "actor_id", nullable = false)
+    private User actor;
     
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Comment parent;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
     
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<Comment> replies = new HashSet<>();
+    @Column(name = "reference_id")
+    private Long referenceId; // post_id, comment_id, etc.
+    
+    @Column(columnDefinition = "TEXT")
+    private String content;
+    
+    @Column(name = "is_read")
+    private Boolean isRead = false;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    
+    public enum NotificationType {
+        LIKE, COMMENT, FOLLOW, MENTION, CIRCLE_INVITE
+    }
 }

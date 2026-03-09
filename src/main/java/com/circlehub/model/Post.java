@@ -21,15 +21,25 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
     
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "media_urls", columnDefinition = "TEXT")
+    private String mediaUrls; // JSON array of media URLs
+    
+    @Column(name = "media_type")
+    @Enumerated(EnumType.STRING)
+    private MediaType mediaType;
+    
+    @Column(name = "is_edited")
+    private Boolean isEdited = false;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -44,4 +54,11 @@ public class Post {
     
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Like> likes = new HashSet<>();
+    
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private Set<SavedPost> savedBy = new HashSet<>();
+    
+    public enum MediaType {
+        NONE, IMAGE, VIDEO, MIXED
+    }
 }

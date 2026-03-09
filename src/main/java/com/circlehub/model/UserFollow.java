@@ -7,37 +7,26 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "user_follows",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "following_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class UserFollow {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_id", nullable = false)
+    private User follower;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Comment parent;
-    
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private Set<Comment> replies = new HashSet<>();
+    @JoinColumn(name = "following_id", nullable = false)
+    private User following;
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
